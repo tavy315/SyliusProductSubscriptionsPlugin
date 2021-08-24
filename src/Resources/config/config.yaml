@@ -1,0 +1,130 @@
+sylius_mailer:
+    emails:
+        product_subscription:
+            template: "@Tavy315SyliusProductSubscriptionsPlugin/Email/notification.html.twig"
+
+sylius_ui:
+    events:
+        sylius.shop.product.show.right_sidebar:
+            blocks:
+                tavy315_sylius_product_subscriptions_subscription: '@Tavy315SyliusProductSubscriptionsPlugin/_addSubscription.html.twig'
+        sylius.shop.product.show.add_to_cart_form:
+            blocks:
+                tavy315_sylius_product_subscriptions_button: '@Tavy315SyliusProductSubscriptionsPlugin/_button.html.twig'
+        sylius.shop.layout.after_body:
+            blocks:
+                tavy315_sylius_product_subscriptions_javascript: '@Tavy315SyliusProductSubscriptionsPlugin/_javascript.html.twig'
+
+sylius_grid:
+    templates:
+        action:
+            customer_details: "@Tavy315SyliusProductSubscriptionsPlugin/Admin/Customer/Subscription/customerDetails.html.twig"
+    grids:
+        tavy315_sylius_product_subscriptions_admin_customer_subscription:
+            driver:
+                name: doctrine/orm
+                options:
+                    class: Tavy315\SyliusProductSubscriptionsPlugin\Entity\Subscription
+            fields:
+                image:
+                    type: twig
+                    label: sylius.ui.image
+                    path: product
+                    options:
+                        template: "@SyliusAdmin/Product/Grid/Field/image.html.twig"
+                product_code:
+                    type: string
+                    label: sylius.ui.code
+                    sortable: ~
+                    path: product.code
+                name:
+                    type: string
+                    label: sylius.ui.name
+                    sortable: translation.name
+                    path: product.name
+                customer:
+                    type: string
+                    label: sylius.ui.customer
+                    path: customer.fullname
+                status:
+                    type: twig
+                    label: sylius.ui.status
+                    options:
+                        template: "@Tavy315SyliusProductSubscriptionsPlugin/Admin/Customer/Subscription/status.html.twig"
+                created_at:
+                    type: datetime
+                    label: sylius.ui.date
+                    sortable: createdAt
+                    options:
+                        format: d/m/Y H:i
+            filters:
+                customer:
+                    type: string
+                    label: sylius.ui.customer
+                    options:
+                        fields: [customer.email, customer.firstName, customer.lastName]
+                code:
+                    type: string
+                    label: sylius.ui.code
+                    options:
+                        fields: [ product.code ]
+                status:
+                    type: select
+                    label: sylius.ui.status
+                    form_options:
+                        choices:
+                            tavy315_sylius_product_subscriptions.ui.status_new: !php/const Tavy315\SyliusProductSubscriptionsPlugin\Entity\SubscriptionInterface::STATUS_NEW
+                            tavy315_sylius_product_subscriptions.ui.status_sent: !php/const Tavy315\SyliusProductSubscriptionsPlugin\Entity\SubscriptionInterface::STATUS_SENT
+                            tavy315_sylius_product_subscriptions.ui.status_deleted: !php/const Tavy315\SyliusProductSubscriptionsPlugin\Entity\SubscriptionInterface::STATUS_DELETED
+                created_at:
+                    type: date
+                    label: sylius.ui.date
+            actions:
+                item:
+                    product_details:
+                        label: tavy315_sylius_product_subscriptions.ui.show_product
+                        type: show
+                        options:
+                            link:
+                                route: sylius_admin_product_show
+                                parameters:
+                                    id: resource.product.id
+                    customer_details:
+                        label: tavy315_sylius_product_subscriptions.ui.show_customer
+                        type: customer_details
+                        options:
+                            link:
+                                route: sylius_admin_customer_show
+                                data:
+                                    customer: resource.customer
+                    delete:
+                        label: tavy315_sylius_product_subscriptions.ui.delete_subscription
+                        type: delete
+        tavy315_sylius_product_subscriptions_shop_account_subscription:
+            driver:
+                name: doctrine/orm
+                options:
+                    class: Tavy315\SyliusProductSubscriptionsPlugin\Entity\Subscription
+                    repository:
+                        method: createByCustomerIdAndChannelIdQueryBuilder
+                        arguments:
+                            - "expr:service('sylius.context.customer').getCustomer().getId()"
+                            - "expr:service('sylius.context.channel').getChannel().getId()"
+            fields:
+                product:
+                    type: twig
+                    label: sylius.ui.product
+                    path: product
+                    options:
+                        template: "@Tavy315SyliusProductSubscriptionsPlugin/Index/product.html.twig"
+                created_at:
+                    type: datetime
+                    label: sylius.ui.date
+                    options:
+                        format: d/m/Y H:i
+                delete:
+                    type: twig
+                    path: product.code
+                    label: sylius.ui.action
+                    options:
+                        template: "@Tavy315SyliusProductSubscriptionsPlugin/Index/delete.html.twig"

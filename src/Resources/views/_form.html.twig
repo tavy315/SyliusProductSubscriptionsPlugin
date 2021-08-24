@@ -1,0 +1,18 @@
+{% form_theme form '@SyliusShop/Form/theme.html.twig' %}
+<div class="ui segment">
+    {{ form_start(form, {
+        'attr': { 'class': 'ui form form-default', 'id': 'product_subscription' },
+        'action': path('tavy315_sylius_product_subscriptions_subscription_add', { 'productCode': productCode })
+    }) }}
+    {% if form.email is defined %}
+        {{ form_row(form.email) }}
+    {% endif %}
+
+    <button type="submit" class="ui huge primary icon labeled button" {{ sylius_test_html_attribute('subscribe-to-notification') }}>
+        <i class="bell icon"></i> {{ 'tavy315_sylius_product_subscriptions.product_page.form_action'|trans }}
+    </button>
+
+    <div class="ui red fluid top pointing basic label hidden sylius-validation-error" id="sylius-product-out-of-stock-validation-error"></div>
+    {{ form_row(form._token) }}
+    {{ form_end(form, {'render_rest': false}) }}
+</div>

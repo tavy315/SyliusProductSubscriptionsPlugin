@@ -1,0 +1,12 @@
+{% set viewOptions = {
+    1: { icon: 'inbox', color: 'blue', label: 'tavy315_sylius_product_subscriptions.ui.status_new' },
+    2: { icon: 'check', color: 'green', label: 'tavy315_sylius_product_subscriptions.ui.status_sent' },
+    3: { icon: 'ban', color: 'red', label: 'tavy315_sylius_product_subscriptions.ui.status_deleted' },
+} %}
+
+{% set value = 'tavy315_sylius_product_subscriptions.ui.status_' ~ viewOptions[data]['label'] %}
+
+<span class="ui {{ viewOptions[data]['color'] }} label">
+    <i class="{{ viewOptions[data]['icon'] }} icon"></i>
+    {{ viewOptions[data]['label']|trans }}
+</span>

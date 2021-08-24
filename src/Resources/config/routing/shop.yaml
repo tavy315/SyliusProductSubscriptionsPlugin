@@ -1,0 +1,27 @@
+tavy315_sylius_product_subscriptions_subscription_add:
+    path: /subscriptions/{productCode}/add
+    methods: [ POST ]
+    defaults:
+        _controller: Tavy315\SyliusProductSubscriptionsPlugin\Controller\AddSubscriptionAction
+
+tavy315_sylius_product_subscriptions_subscription_form:
+    path: /_partial/subscriptions/{productCode}
+    methods: [ GET ]
+    defaults:
+        _controller: Tavy315\SyliusProductSubscriptionsPlugin\Controller\SubscriptionFormAction
+
+tavy315_sylius_product_subscriptions_subscription_delete:
+    path: /subscriptions/{productCode}/delete
+    methods: [ GET ]
+    defaults:
+        _controller: Tavy315\SyliusProductSubscriptionsPlugin\Controller\DeleteSubscriptionAction
+
+tavy315_sylius_product_subscriptions_shop_account_subscription_index:
+    path: /account/subscriptions
+    methods: [ GET ]
+    defaults:
+        _controller: tavy315_sylius_product_subscriptions.controller.subscription:indexAction
+        _sylius:
+            section: shop_account
+            template: "@Tavy315SyliusProductSubscriptionsPlugin/Index/list.html.twig"
+            grid: tavy315_sylius_product_subscriptions_shop_account_subscription

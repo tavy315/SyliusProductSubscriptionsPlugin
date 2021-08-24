@@ -1,0 +1,14 @@
+tavy315_sylius_product_subscriptions_admin_notification_subscription:
+    resource: |
+        alias: tavy315_sylius_product_subscriptions.subscription
+        section: admin
+        path: subscriptions
+        templates: "@SyliusAdmin\\Crud"
+        redirect: update
+        grid: tavy315_sylius_product_subscriptions_admin_customer_subscription
+        vars:
+            all:
+                header: tavy315_sylius_product_subscriptions.ui.subscriptions
+            index:
+                icon: 'bell'
+    type: sylius.resource

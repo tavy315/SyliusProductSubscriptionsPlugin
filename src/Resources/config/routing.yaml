@@ -1,0 +1,6 @@
+tavy315_sylius_product_subscriptions_admin_subscription:
+  resource: "@Tavy315SyliusProductSubscriptionsPlugin/Resources/config/routing/admin.yaml"
+  prefix: /admin
+
+tavy315_sylius_product_subscriptions_shop_subscription:
+  resource: "@Tavy315SyliusProductSubscriptionsPlugin/Resources/config/routing/shop.yaml"

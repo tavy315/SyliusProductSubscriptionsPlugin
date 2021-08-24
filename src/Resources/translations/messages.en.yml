@@ -1,0 +1,27 @@
+tavy315_sylius_product_subscriptions:
+    email:
+        action: 'Buy now'
+        message: 'We inform you that the product {product} is back in stock.'
+        title: 'Product available again'
+    form:
+        invalid_email: 'Error during form submission, please check email syntax'
+        invalid_form: 'Error during form submission, please try again'
+        product_in_stock: 'Not possible to subscribe to a product in stock'
+        subscription_deleted: 'Product subscription was deleted'
+        subscription_not_found: 'Product subscription not found'
+        subscribed_for_notification: 'Subscribed for notification'
+        success: 'We will send you a reminder as soon as this product is back in stock.'
+    my_account_section:
+        delete: 'Delete'
+        menu_label: 'Product subscriptions'
+        title: 'Product subscriptions'
+    product_page:
+        form_action: 'Inform me when product back in stock!'
+    ui:
+        delete_subscription: 'Delete Subscription'
+        show_customer: 'Show Customer'
+        show_product: 'Show Product'
+        status_deleted: 'Deleted by customer'
+        status_new: 'New subscription'
+        status_sent: 'Notification sent'
+        subscriptions: 'Product subscriptions'

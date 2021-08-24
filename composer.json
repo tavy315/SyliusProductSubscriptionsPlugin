@@ -1,0 +1,32 @@
+{
+    "name": "tavy315/sylius-product-subscriptions-plugin",
+    "type": "sylius-plugin",
+    "description": "Send notifications to your customers when a product returns in stock",
+    "keywords": [
+        "sylius",
+        "sylius-plugin"
+    ],
+    "license": "MIT",
+    "require": {
+        "php": "^7.4",
+        "sylius/sylius": "~1.8.0"
+    },
+    "require-dev": {
+        "sensiolabs/security-checker": "^6.0",
+        "sylius-labs/coding-standard": "^3.2 || ^v4.1"
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.8-dev"
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Tavy315\\SyliusProductSubscriptionsPlugin\\": "src/"
+        }
+    },
+    "prefer-stable": true
+}

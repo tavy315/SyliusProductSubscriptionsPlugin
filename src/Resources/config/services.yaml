@@ -1,0 +1,72 @@
+services:
+    tavy315_sylius_product_subscriptions.repository.subscription:
+        class: Tavy315\SyliusProductSubscriptionsPlugin\Repository\SubscriptionRepository
+        autowire: true
+        autoconfigure: true
+
+    Tavy315\SyliusProductSubscriptionsPlugin\Repository\SubscriptionRepositoryInterface:
+        alias: tavy315_sylius_product_subscriptions.repository.subscription
+
+    Tavy315\SyliusProductSubscriptionsPlugin\Command\SendNotificationsCommand:
+        tags: [ 'console.command' ]
+        arguments:
+            - '@sylius.availability_checker'
+            - '@tavy315_sylius_product_subscriptions.subscription_notifier'
+            - '@tavy315_sylius_product_subscriptions.repository.subscription'
+
+    tavy315_sylius_product_subscriptions.custom_factory.subscription:
+        class: Tavy315\SyliusProductSubscriptionsPlugin\Factory\SubscriptionFactory
+        decorates: tavy315_sylius_product_subscriptions.factory.subscription
+        public: false
+        arguments:
+            - "@tavy315_sylius_product_subscriptions.custom_factory.subscription.inner"
+
+    tavy315_sylius_product_subscriptions.notifier_subscriber:
+        class: Tavy315\SyliusProductSubscriptionsPlugin\EventSubscriber\NotifierSubscriber
+        arguments:
+            - '@tavy315_sylius_product_subscriptions.repository.subscription'
+            - '@tavy315_sylius_product_subscriptions.subscription_notifier'
+        tags:
+            - { name: kernel.event_listener, event: sylius.product_variant.post_update, method: productVariantNotification }
+            - { name: kernel.event_listener, event: sylius.product.post_update, method: productNotification }
+
+    tavy315_sylius_product_subscriptions.subscription_notifier:
+        class: Tavy315\SyliusProductSubscriptionsPlugin\Service\SubscriptionNotifier
+        arguments:
+            - '@sylius.email_sender'
+
+    Tavy315\SyliusProductSubscriptionsPlugin\Controller\AddSubscriptionAction:
+        tags: [ 'controller.service_arguments' ]
+        arguments:
+            - '@sylius.availability_checker'
+            - '@sylius.context.channel'
+            - '@sylius.context.customer'
+            - '@sylius.repository.customer'
+            - '@sylius.factory.customer'
+            - '@tavy315_sylius_product_subscriptions.factory.subscription'
+            - '@sylius.context.locale'
+            - '@sylius.repository.product'
+            - '@tavy315_sylius_product_subscriptions.repository.subscription'
+            - '@translator.data_collector'
+            - '@debug.validator'
+
+    Tavy315\SyliusProductSubscriptionsPlugin\Controller\DeleteSubscriptionAction:
+        tags: [ 'controller.service_arguments' ]
+        arguments:
+            - '@sylius.context.customer'
+            - '@sylius.repository.product'
+            - '@tavy315_sylius_product_subscriptions.repository.subscription'
+            - '@translator.data_collector'
+
+    Tavy315\SyliusProductSubscriptionsPlugin\Controller\SubscriptionFormAction:
+        tags: [ 'controller.service_arguments' ]
+        arguments:
+            - '@sylius.context.customer'
+
+    Tavy315\SyliusProductSubscriptionsPlugin\Menu\AccountMenuListener:
+        tags:
+            - { name: kernel.event_listener, event: sylius.menu.shop.account, method: addMenuItems }
+
+    Tavy315\SyliusProductSubscriptionsPlugin\Menu\AdminMenuListener:
+        tags:
+            - { name: kernel.event_listener, event: sylius.menu.admin.main, method: addAdminMenuItems }

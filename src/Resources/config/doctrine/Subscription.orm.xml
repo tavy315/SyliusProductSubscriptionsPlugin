@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
+                                      http://doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+
+    <mapped-superclass name="Tavy315\SyliusProductSubscriptionsPlugin\Entity\Subscription" table="tavy315_sylius_product_subscriptions">
+        <id name="id" column="id" type="integer">
+            <generator strategy="AUTO" />
+        </id>
+
+        <field name="status" type="integer" />
+        <field name="localeCode" type="string" column="local_code" />
+        <field name="createdAt" column="created_at" type="datetime" />
+        <field name="updatedAt" column="updated_at" type="datetime" nullable="true" />
+
+        <many-to-one field="customer" target-entity="Sylius\Component\Customer\Model\CustomerInterface">
+            <join-column name="customer_id" />
+        </many-to-one>
+
+        <many-to-one field="product" target-entity="Sylius\Component\Core\Model\ProductInterface">
+            <join-column name="product_id" nullable="false" />
+        </many-to-one>
+
+        <many-to-one field="channel" target-entity="Sylius\Component\Channel\Model\ChannelInterface">
+            <join-column name="channel_id" nullable="false" />
+        </many-to-one>
+
+        <indexes>
+            <index columns="status" />
+        </indexes>
+    </mapped-superclass>
+</doctrine-mapping>
