@@ -100,6 +100,7 @@ sylius_grid:
                     delete:
                         label: tavy315_sylius_product_subscriptions.ui.delete_subscription
                         type: delete
+            sorting: { created_at: desc }
         tavy315_sylius_product_subscriptions_shop_account_subscription:
             driver:
                 name: doctrine/orm
@@ -120,6 +121,7 @@ sylius_grid:
                 created_at:
                     type: datetime
                     label: sylius.ui.date
+                    sortable: createdAt
                     options:
                         format: d/m/Y H:i
                 delete:
@@ -128,3 +130,4 @@ sylius_grid:
                     label: sylius.ui.action
                     options:
                         template: "@Tavy315SyliusProductSubscriptionsPlugin/Index/delete.html.twig"
+            sorting: { created_at: desc }
