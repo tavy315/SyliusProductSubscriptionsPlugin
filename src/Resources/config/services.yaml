@@ -45,10 +45,12 @@ services:
             - '@sylius.repository.customer'
             - '@sylius.factory.customer'
             - '@tavy315_sylius_product_subscriptions.factory.subscription'
+            - '@form.factory'
             - '@sylius.context.locale'
             - '@sylius.repository.product'
             - '@tavy315_sylius_product_subscriptions.repository.subscription'
             - '@translator.data_collector'
+            - '@twig'
             - '@debug.validator'
 
     Tavy315\SyliusProductSubscriptionsPlugin\Controller\DeleteSubscriptionAction:
@@ -56,6 +58,8 @@ services:
         arguments:
             - '@sylius.context.customer'
             - '@sylius.repository.product'
+            - '@router'
+            - '@session'
             - '@tavy315_sylius_product_subscriptions.repository.subscription'
             - '@translator.data_collector'
 
@@ -63,6 +67,8 @@ services:
         tags: [ 'controller.service_arguments' ]
         arguments:
             - '@sylius.context.customer'
+            - '@form.factory'
+            - '@twig'
 
     Tavy315\SyliusProductSubscriptionsPlugin\Menu\AccountMenuListener:
         tags:

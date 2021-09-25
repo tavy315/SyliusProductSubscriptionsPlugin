@@ -13,7 +13,7 @@ use Sylius\Component\Customer\Context\CustomerContextInterface;
 use Sylius\Component\Inventory\Checker\AvailabilityCheckerInterface;
 use Sylius\Component\Locale\Context\LocaleContextInterface;
 use Sylius\Component\Resource\Factory\FactoryInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -26,8 +26,9 @@ use Tavy315\SyliusProductSubscriptionsPlugin\Entity\SubscriptionInterface;
 use Tavy315\SyliusProductSubscriptionsPlugin\Factory\SubscriptionFactoryInterface;
 use Tavy315\SyliusProductSubscriptionsPlugin\Form\SubscriptionType;
 use Tavy315\SyliusProductSubscriptionsPlugin\Repository\SubscriptionRepositoryInterface;
+use Twig\Environment;
 
-final class AddSubscriptionAction extends AbstractController
+final class AddSubscriptionAction
 {
     private AvailabilityCheckerInterface $availabilityChecker;
 
@@ -41,6 +42,8 @@ final class AddSubscriptionAction extends AbstractController
 
     private SubscriptionFactoryInterface $factory;
 
+    private FormFactoryInterface $formFactory;
+
     private LocaleContextInterface $localeContext;
 
     private ProductRepositoryInterface $productRepository;
@@ -48,6 +51,8 @@ final class AddSubscriptionAction extends AbstractController
     private SubscriptionRepositoryInterface $repository;
 
     private TranslatorInterface $translator;
+
+    private Environment $twig;
 
     private ValidatorInterface $validator;
 
@@ -58,10 +63,12 @@ final class AddSubscriptionAction extends AbstractController
         CustomerRepositoryInterface     $customerRepository,
         FactoryInterface                $customerFactory,
         SubscriptionFactoryInterface    $factory,
+        FormFactoryInterface            $formFactory,
         LocaleContextInterface          $localeContext,
         ProductRepositoryInterface      $productRepository,
         SubscriptionRepositoryInterface $repository,
         TranslatorInterface             $translator,
+        Environment                     $twig,
         ValidatorInterface              $validator
     ) {
         $this->availabilityChecker = $availabilityChecker;
@@ -70,10 +77,12 @@ final class AddSubscriptionAction extends AbstractController
         $this->customerRepository = $customerRepository;
         $this->customerFactory = $customerFactory;
         $this->factory = $factory;
+        $this->formFactory = $formFactory;
         $this->localeContext = $localeContext;
         $this->productRepository = $productRepository;
         $this->repository = $repository;
         $this->translator = $translator;
+        $this->twig = $twig;
         $this->validator = $validator;
     }
 
@@ -88,7 +97,7 @@ final class AddSubscriptionAction extends AbstractController
             return new JsonResponse([ 'error' => $this->translator->trans('tavy315_sylius_product_subscriptions.form.product_in_stock') ], 400);
         }
 
-        $form = $this->createForm(SubscriptionType::class);
+        $form = $this->formFactory->create(SubscriptionType::class);
 
         $customer = $this->customerContext->getCustomer();
         if ($customer !== null && $customer->getEmail() !== null) {
@@ -120,8 +129,8 @@ final class AddSubscriptionAction extends AbstractController
         $this->updateSubscription($subscription);
 
         return new JsonResponse([
-            'notification' => $this->renderView('@Tavy315SyliusProductSubscriptionsPlugin/_notification.html.twig'),
-            'success'      => $this->renderView('@Tavy315SyliusProductSubscriptionsPlugin/_success.html.twig'),
+            'notification' => $this->twig->render('@Tavy315SyliusProductSubscriptionsPlugin/_notification.html.twig'),
+            'success'      => $this->twig->render('@Tavy315SyliusProductSubscriptionsPlugin/_success.html.twig'),
         ], Response::HTTP_CREATED);
     }
 

@@ -7,18 +7,25 @@ namespace Tavy315\SyliusProductSubscriptionsPlugin\Controller;
 use Sylius\Component\Core\Model\ProductInterface;
 use Sylius\Component\Core\Repository\ProductRepositoryInterface;
 use Sylius\Component\Customer\Context\CustomerContextInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Tavy315\SyliusProductSubscriptionsPlugin\Entity\SubscriptionInterface;
 use Tavy315\SyliusProductSubscriptionsPlugin\Repository\SubscriptionRepositoryInterface;
 
-final class DeleteSubscriptionAction extends AbstractController
+final class DeleteSubscriptionAction
 {
     private CustomerContextInterface $customerContext;
 
     private ProductRepositoryInterface $productRepository;
+
+    private RouterInterface $router;
+
+    private SessionInterface $session;
 
     private SubscriptionRepositoryInterface $repository;
 
@@ -27,12 +34,16 @@ final class DeleteSubscriptionAction extends AbstractController
     public function __construct(
         CustomerContextInterface        $customerContext,
         ProductRepositoryInterface      $productRepository,
+        RouterInterface                 $router,
+        SessionInterface                $session,
         SubscriptionRepositoryInterface $subscriptionRepository,
         TranslatorInterface             $translator
     ) {
         $this->customerContext = $customerContext;
         $this->productRepository = $productRepository;
         $this->repository = $subscriptionRepository;
+        $this->router = $router;
+        $this->session = $session;
         $this->translator = $translator;
     }
 
@@ -41,9 +52,9 @@ final class DeleteSubscriptionAction extends AbstractController
         $product = $this->productRepository->findOneBy([ 'code' => $productCode ]);
 
         if (!$product instanceof ProductInterface) {
-            $this->addFlash('error', $this->translator->trans('tavy315_sylius_product_subscriptions.form.subscription_not_found'));
+            $this->session->getFlashBag()->add('error', $this->translator->trans('tavy315_sylius_product_subscriptions.form.subscription_not_found'));
 
-            return $this->redirect($this->getRefererUrl($request));
+            return new RedirectResponse($this->getRefererUrl($request), 302);
         }
 
         /** @var SubscriptionInterface|null $subscription */
@@ -53,24 +64,24 @@ final class DeleteSubscriptionAction extends AbstractController
         ]);
 
         if ($subscription === null) {
-            $this->addFlash('error', $this->translator->trans('tavy315_sylius_product_subscriptions.form.subscription_not_found'));
+            $this->session->getFlashBag()->add('error', $this->translator->trans('tavy315_sylius_product_subscriptions.form.subscription_not_found'));
 
-            return $this->redirect($this->getRefererUrl($request));
+            return new RedirectResponse($this->getRefererUrl($request), 302);
         }
 
         $subscription->setStatus(SubscriptionInterface::STATUS_DELETED);
 
         $this->repository->add($subscription);
 
-        $this->addFlash('info', $this->translator->trans('tavy315_sylius_product_subscriptions.form.subscription_deleted'));
+        $this->session->getFlashBag()->add('info', $this->translator->trans('tavy315_sylius_product_subscriptions.form.subscription_deleted'));
 
-        return $this->redirect($this->getRefererUrl($request));
+        return new RedirectResponse($this->getRefererUrl($request), 302);
     }
 
     private function getRefererUrl(Request $request): string
     {
         $referer = $request->headers->get('referer');
 
-        return !is_string($referer) ? $this->generateUrl('sylius_shop_homepage') : $referer;
+        return !is_string($referer) ? $this->router->generate('sylius_shop_homepage', [], UrlGeneratorInterface::ABSOLUTE_PATH) : $referer;
     }
 }
