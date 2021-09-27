@@ -49,9 +49,9 @@ services:
             - '@sylius.context.locale'
             - '@sylius.repository.product'
             - '@tavy315_sylius_product_subscriptions.repository.subscription'
-            - '@translator.data_collector'
+            - '@translator'
             - '@twig'
-            - '@debug.validator'
+            - '@validator'
 
     Tavy315\SyliusProductSubscriptionsPlugin\Controller\DeleteSubscriptionAction:
         tags: [ 'controller.service_arguments' ]
@@ -61,7 +61,7 @@ services:
             - '@router'
             - '@session'
             - '@tavy315_sylius_product_subscriptions.repository.subscription'
-            - '@translator.data_collector'
+            - '@translator'
 
     Tavy315\SyliusProductSubscriptionsPlugin\Controller\SubscriptionFormAction:
         tags: [ 'controller.service_arguments' ]
