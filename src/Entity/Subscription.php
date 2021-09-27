@@ -9,7 +9,7 @@ use Sylius\Component\Core\Model\ProductInterface;
 use Sylius\Component\Customer\Model\CustomerInterface;
 use Sylius\Component\Resource\Model\TimestampableTrait;
 
-final class Subscription implements SubscriptionInterface
+class Subscription implements SubscriptionInterface
 {
     use TimestampableTrait;
 
