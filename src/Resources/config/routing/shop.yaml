@@ -20,7 +20,7 @@ tavy315_sylius_product_subscriptions_shop_account_subscription_index:
     path: /account/subscriptions
     methods: [ GET ]
     defaults:
-        _controller: tavy315_sylius_product_subscriptions.controller.subscription:indexAction
+        _controller: tavy315_sylius_product_subscriptions.controller.subscription::indexAction
         _sylius:
             section: shop_account
             template: "@Tavy315SyliusProductSubscriptionsPlugin/Index/list.html.twig"

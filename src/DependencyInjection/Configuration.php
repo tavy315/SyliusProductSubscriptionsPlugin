@@ -39,7 +39,6 @@ final class Configuration implements ConfigurationInterface
                                     ->addDefaultsIfNotSet()
                                     ->children()
                                         ->scalarNode('model')->defaultValue(Subscription::class)->cannotBeEmpty()->end()
-                                        ->scalarNode('interface')->defaultValue(SubscriptionInterface::class)->cannotBeEmpty()->end()
                                         ->scalarNode('controller')->defaultValue(ResourceController::class)->cannotBeEmpty()->end()
                                         ->scalarNode('factory')->defaultValue(Factory::class)->end()
                                         ->scalarNode('form')->defaultValue(SubscriptionType::class)->cannotBeEmpty()->end()
