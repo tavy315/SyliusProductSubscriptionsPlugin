@@ -59,7 +59,7 @@ services:
             - '@sylius.context.customer'
             - '@sylius.repository.product'
             - '@router'
-            - '@session'
+            - '@request_stack'
             - '@tavy315_sylius_product_subscriptions.repository.subscription'
             - '@translator'
 

@@ -9,11 +9,12 @@ use Sylius\Component\Core\Repository\ProductRepositoryInterface;
 use Sylius\Component\Customer\Context\CustomerContextInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Tavy315\SyliusProductSubscriptionsPlugin\Entity\StatusAwareInterface;
 use Tavy315\SyliusProductSubscriptionsPlugin\Entity\SubscriptionInterface;
 use Tavy315\SyliusProductSubscriptionsPlugin\Repository\SubscriptionRepositoryInterface;
 
@@ -25,7 +26,7 @@ final class DeleteSubscriptionAction
 
     private RouterInterface $router;
 
-    private SessionInterface $session;
+    private RequestStack $requestStack;
 
     private SubscriptionRepositoryInterface $repository;
 
@@ -35,7 +36,7 @@ final class DeleteSubscriptionAction
         CustomerContextInterface        $customerContext,
         ProductRepositoryInterface      $productRepository,
         RouterInterface                 $router,
-        SessionInterface                $session,
+        RequestStack                    $requestStack,
         SubscriptionRepositoryInterface $subscriptionRepository,
         TranslatorInterface             $translator
     ) {
@@ -43,16 +44,18 @@ final class DeleteSubscriptionAction
         $this->productRepository = $productRepository;
         $this->repository = $subscriptionRepository;
         $this->router = $router;
-        $this->session = $session;
+        $this->requestStack = $requestStack;
         $this->translator = $translator;
     }
 
     public function __invoke(Request $request, string $productCode): Response
     {
+        $session = $this->requestStack->getSession();
+
         $product = $this->productRepository->findOneBy([ 'code' => $productCode ]);
 
         if (!$product instanceof ProductInterface) {
-            $this->session->getFlashBag()->add('error', $this->translator->trans('tavy315_sylius_product_subscriptions.form.subscription_not_found'));
+            $session->getFlashBag()->add('error', $this->translator->trans('tavy315_sylius_product_subscriptions.form.subscription_not_found'));
 
             return new RedirectResponse($this->getRefererUrl($request), 302);
         }
@@ -64,16 +67,16 @@ final class DeleteSubscriptionAction
         ]);
 
         if ($subscription === null) {
-            $this->session->getFlashBag()->add('error', $this->translator->trans('tavy315_sylius_product_subscriptions.form.subscription_not_found'));
+            $session->getFlashBag()->add('error', $this->translator->trans('tavy315_sylius_product_subscriptions.form.subscription_not_found'));
 
             return new RedirectResponse($this->getRefererUrl($request), 302);
         }
 
-        $subscription->setStatus(SubscriptionInterface::STATUS_DELETED);
+        $subscription->setStatus(StatusAwareInterface::STATUS_DELETED);
 
         $this->repository->add($subscription);
 
-        $this->session->getFlashBag()->add('info', $this->translator->trans('tavy315_sylius_product_subscriptions.form.subscription_deleted'));
+        $session->getFlashBag()->add('info', $this->translator->trans('tavy315_sylius_product_subscriptions.form.subscription_deleted'));
 
         return new RedirectResponse($this->getRefererUrl($request), 302);
     }
