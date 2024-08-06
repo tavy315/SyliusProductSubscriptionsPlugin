@@ -9,26 +9,17 @@ use Sylius\Component\Core\Model\ProductVariant;
 use Sylius\Component\Inventory\Checker\AvailabilityCheckerInterface;
 use Sylius\Component\Product\Model\Product;
 use Sylius\Component\Product\Model\ProductInterface;
-use Tavy315\SyliusProductSubscriptionsPlugin\Entity\SubscriptionInterface;
+use Tavy315\SyliusProductSubscriptionsPlugin\Entity\StatusAwareInterface;
 use Tavy315\SyliusProductSubscriptionsPlugin\Repository\SubscriptionRepositoryInterface;
-use Tavy315\SyliusProductSubscriptionsPlugin\Service\SubscriptionNotifier;
+use Tavy315\SyliusProductSubscriptionsPlugin\Service\SubscriptionNotifierInterface;
 
-final class NotifierSubscriber
+final readonly class NotifierSubscriber
 {
-    private AvailabilityCheckerInterface $availabilityChecker;
-
-    private SubscriptionNotifier $subscriptionNotifier;
-
-    private SubscriptionRepositoryInterface $subscriptionRepository;
-
     public function __construct(
-        AvailabilityCheckerInterface    $availabilityChecker,
-        SubscriptionNotifier            $subscriptionNotifier,
-        SubscriptionRepositoryInterface $subscriptionRepository
+        private AvailabilityCheckerInterface $availabilityChecker,
+        private SubscriptionNotifierInterface $subscriptionNotifier,
+        private SubscriptionRepositoryInterface $subscriptionRepository
     ) {
-        $this->availabilityChecker = $availabilityChecker;
-        $this->subscriptionNotifier = $subscriptionNotifier;
-        $this->subscriptionRepository = $subscriptionRepository;
     }
 
     public function productNotification(ResourceControllerEvent $event): void
@@ -79,13 +70,13 @@ final class NotifierSubscriber
     {
         $subscriptions = $this->subscriptionRepository->findBy([
             'product' => $product,
-            'status'  => SubscriptionInterface::STATUS_NEW,
+            'status'  => StatusAwareInterface::STATUS_NEW,
         ]);
 
         foreach ($subscriptions as $subscription) {
             $this->subscriptionNotifier->sendEmail($subscription, $product);
 
-            $subscription->setStatus(SubscriptionInterface::STATUS_SENT);
+            $subscription->setStatus(StatusAwareInterface::STATUS_SENT);
 
             $this->subscriptionRepository->add($subscription);
         }

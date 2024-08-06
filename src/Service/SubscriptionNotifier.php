@@ -8,7 +8,7 @@ use Sylius\Component\Mailer\Sender\SenderInterface;
 use Sylius\Component\Product\Model\ProductInterface;
 use Tavy315\SyliusProductSubscriptionsPlugin\Entity\SubscriptionInterface;
 
-final class SubscriptionNotifier
+final class SubscriptionNotifier implements SubscriptionNotifierInterface
 {
     private SenderInterface $sender;
 

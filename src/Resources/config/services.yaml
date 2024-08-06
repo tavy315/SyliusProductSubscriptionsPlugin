@@ -11,7 +11,7 @@ services:
         tags: [ 'console.command' ]
         arguments:
             - '@sylius.availability_checker'
-            - '@tavy315_sylius_product_subscriptions.subscription_notifier'
+            - '@Tavy315\SyliusProductSubscriptionsPlugin\Service\SubscriptionNotifierInterface'
             - '@tavy315_sylius_product_subscriptions.repository.subscription'
 
     tavy315_sylius_product_subscriptions.custom_factory.subscription:
@@ -21,17 +21,16 @@ services:
         arguments:
             - "@tavy315_sylius_product_subscriptions.custom_factory.subscription.inner"
 
-    tavy315_sylius_product_subscriptions.notifier_subscriber:
-        class: Tavy315\SyliusProductSubscriptionsPlugin\EventSubscriber\NotifierSubscriber
+    Tavy315\SyliusProductSubscriptionsPlugin\EventSubscriber\NotifierSubscriber:
         arguments:
             - '@sylius.availability_checker'
-            - '@tavy315_sylius_product_subscriptions.subscription_notifier'
+            - '@Tavy315\SyliusProductSubscriptionsPlugin\Service\SubscriptionNotifierInterface'
             - '@tavy315_sylius_product_subscriptions.repository.subscription'
         tags:
             - { name: kernel.event_listener, event: sylius.product_variant.post_update, method: productVariantNotification }
             - { name: kernel.event_listener, event: sylius.product.post_update, method: productNotification }
 
-    tavy315_sylius_product_subscriptions.subscription_notifier:
+    Tavy315\SyliusProductSubscriptionsPlugin\Service\SubscriptionNotifierInterface:
         class: Tavy315\SyliusProductSubscriptionsPlugin\Service\SubscriptionNotifier
         arguments:
             - '@sylius.email_sender'
