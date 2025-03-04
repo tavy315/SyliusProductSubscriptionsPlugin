@@ -28,62 +28,23 @@ use Tavy315\SyliusProductSubscriptionsPlugin\Form\SubscriptionType;
 use Tavy315\SyliusProductSubscriptionsPlugin\Repository\SubscriptionRepositoryInterface;
 use Twig\Environment;
 
-final class AddSubscriptionAction
+final readonly class AddSubscriptionAction
 {
-    private AvailabilityCheckerInterface $availabilityChecker;
-
-    private ChannelContextInterface $channelContext;
-
-    private CustomerContextInterface $customerContext;
-
-    private CustomerRepositoryInterface $customerRepository;
-
-    private FactoryInterface $customerFactory;
-
-    private SubscriptionFactoryInterface $factory;
-
-    private FormFactoryInterface $formFactory;
-
-    private LocaleContextInterface $localeContext;
-
-    private ProductRepositoryInterface $productRepository;
-
-    private SubscriptionRepositoryInterface $repository;
-
-    private TranslatorInterface $translator;
-
-    private Environment $twig;
-
-    private ValidatorInterface $validator;
-
     public function __construct(
-        AvailabilityCheckerInterface    $availabilityChecker,
-        ChannelContextInterface         $channelContext,
-        CustomerContextInterface        $customerContext,
-        CustomerRepositoryInterface     $customerRepository,
-        FactoryInterface                $customerFactory,
-        SubscriptionFactoryInterface    $factory,
-        FormFactoryInterface            $formFactory,
-        LocaleContextInterface          $localeContext,
-        ProductRepositoryInterface      $productRepository,
-        SubscriptionRepositoryInterface $repository,
-        TranslatorInterface             $translator,
-        Environment                     $twig,
-        ValidatorInterface              $validator
+        private AvailabilityCheckerInterface    $availabilityChecker,
+        private ChannelContextInterface         $channelContext,
+        private CustomerContextInterface        $customerContext,
+        private CustomerRepositoryInterface     $customerRepository,
+        private FactoryInterface                $customerFactory,
+        private SubscriptionFactoryInterface    $factory,
+        private FormFactoryInterface            $formFactory,
+        private LocaleContextInterface          $localeContext,
+        private ProductRepositoryInterface      $productRepository,
+        private SubscriptionRepositoryInterface $repository,
+        private TranslatorInterface             $translator,
+        private Environment                     $twig,
+        private ValidatorInterface              $validator
     ) {
-        $this->availabilityChecker = $availabilityChecker;
-        $this->channelContext = $channelContext;
-        $this->customerContext = $customerContext;
-        $this->customerRepository = $customerRepository;
-        $this->customerFactory = $customerFactory;
-        $this->factory = $factory;
-        $this->formFactory = $formFactory;
-        $this->localeContext = $localeContext;
-        $this->productRepository = $productRepository;
-        $this->repository = $repository;
-        $this->translator = $translator;
-        $this->twig = $twig;
-        $this->validator = $validator;
     }
 
     public function __invoke(Request $request, string $productCode): Response
@@ -94,7 +55,10 @@ final class AddSubscriptionAction
         }
 
         if ($this->availabilityChecker->isStockAvailable($product->getEnabledVariants()->first())) {
-            return new JsonResponse([ 'error' => $this->translator->trans('tavy315_sylius_product_subscriptions.form.product_in_stock') ], 400);
+            return new JsonResponse(
+                [ 'error' => $this->translator->trans('tavy315_sylius_product_subscriptions.form.product_in_stock') ],
+                400
+            );
         }
 
         $form = $this->formFactory->create(SubscriptionType::class);
@@ -107,7 +71,10 @@ final class AddSubscriptionAction
         $form->handleRequest($request);
 
         if (!$form->isSubmitted() || !$form->isValid()) {
-            return new JsonResponse([ 'error' => $this->translator->trans('tavy315_sylius_product_subscriptions.form.invalid_form') ], 400);
+            return new JsonResponse(
+                [ 'error' => $this->translator->trans('tavy315_sylius_product_subscriptions.form.invalid_form') ],
+                400
+            );
         }
 
         $data = $form->getData();
@@ -119,8 +86,12 @@ final class AddSubscriptionAction
 
         if (array_key_exists('email', $data)) {
             $errors = $this->validator->validate((string) $data['email'], [ new Email(), new NotBlank() ]);
+
             if (count($errors) > 0) {
-                return new JsonResponse([ 'error' => $this->translator->trans('tavy315_sylius_product_subscriptions.form.invalid_email') ], 400);
+                return new JsonResponse(
+                    [ 'error' => $this->translator->trans('tavy315_sylius_product_subscriptions.form.invalid_email') ],
+                    400
+                );
             }
 
             $subscription->setCustomer($this->getCustomerByEmail((string) $data['email']));
@@ -151,11 +122,10 @@ final class AddSubscriptionAction
 
     private function updateSubscription(SubscriptionInterface $subscription): void
     {
-        $alreadyExists = $this->repository->findOneBy([
-            'customer' => $subscription->getCustomer(),
-            'product'  => $subscription->getProduct(),
-            'status'   => SubscriptionInterface::STATUS_NEW,
-        ]);
+        $alreadyExists = $this->repository->getNewSubscriptionByCustomerAndProduct(
+            $subscription->getCustomer(),
+            $subscription->getProduct()
+        );
 
         if ($alreadyExists === null) {
             $subscription->setChannel($this->channelContext->getChannel());

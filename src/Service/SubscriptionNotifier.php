@@ -8,13 +8,10 @@ use Sylius\Component\Mailer\Sender\SenderInterface;
 use Sylius\Component\Product\Model\ProductInterface;
 use Tavy315\SyliusProductSubscriptionsPlugin\Entity\SubscriptionInterface;
 
-final class SubscriptionNotifier implements SubscriptionNotifierInterface
+final readonly class SubscriptionNotifier implements SubscriptionNotifierInterface
 {
-    private SenderInterface $sender;
-
-    public function __construct(SenderInterface $sender)
+    public function __construct(private SenderInterface $sender)
     {
-        $this->sender = $sender;
     }
 
     public function sendEmail(SubscriptionInterface $subscription, ProductInterface $product): void

@@ -15,37 +15,18 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Tavy315\SyliusProductSubscriptionsPlugin\Entity\StatusAwareInterface;
-use Tavy315\SyliusProductSubscriptionsPlugin\Entity\SubscriptionInterface;
 use Tavy315\SyliusProductSubscriptionsPlugin\Repository\SubscriptionRepositoryInterface;
 
-final class DeleteSubscriptionAction
+final readonly class DeleteSubscriptionAction
 {
-    private CustomerContextInterface $customerContext;
-
-    private ProductRepositoryInterface $productRepository;
-
-    private RouterInterface $router;
-
-    private RequestStack $requestStack;
-
-    private SubscriptionRepositoryInterface $repository;
-
-    private TranslatorInterface $translator;
-
     public function __construct(
-        CustomerContextInterface        $customerContext,
-        ProductRepositoryInterface      $productRepository,
-        RouterInterface                 $router,
-        RequestStack                    $requestStack,
-        SubscriptionRepositoryInterface $subscriptionRepository,
-        TranslatorInterface             $translator
+        private CustomerContextInterface        $customerContext,
+        private ProductRepositoryInterface      $productRepository,
+        private RouterInterface                 $router,
+        private RequestStack                    $requestStack,
+        private SubscriptionRepositoryInterface $repository,
+        private TranslatorInterface             $translator
     ) {
-        $this->customerContext = $customerContext;
-        $this->productRepository = $productRepository;
-        $this->repository = $subscriptionRepository;
-        $this->router = $router;
-        $this->requestStack = $requestStack;
-        $this->translator = $translator;
     }
 
     public function __invoke(Request $request, string $productCode): Response
@@ -55,19 +36,24 @@ final class DeleteSubscriptionAction
         $product = $this->productRepository->findOneBy([ 'code' => $productCode ]);
 
         if (!$product instanceof ProductInterface) {
-            $session->getFlashBag()->add('error', $this->translator->trans('tavy315_sylius_product_subscriptions.form.subscription_not_found'));
+            $session->getFlashBag()->add(
+                'error',
+                $this->translator->trans('tavy315_sylius_product_subscriptions.form.subscription_not_found')
+            );
 
             return new RedirectResponse($this->getRefererUrl($request), 302);
         }
 
-        /** @var SubscriptionInterface|null $subscription */
-        $subscription = $this->repository->findOneBy([
-            'customer' => $this->customerContext->getCustomer(),
-            'product'  => $product,
-        ]);
+        $subscription = $this->repository->getNewSubscriptionByCustomerAndProduct(
+            $this->customerContext->getCustomer(),
+            $product
+        );
 
         if ($subscription === null) {
-            $session->getFlashBag()->add('error', $this->translator->trans('tavy315_sylius_product_subscriptions.form.subscription_not_found'));
+            $session->getFlashBag()->add(
+                'error',
+                $this->translator->trans('tavy315_sylius_product_subscriptions.form.subscription_not_found')
+            );
 
             return new RedirectResponse($this->getRefererUrl($request), 302);
         }
@@ -76,7 +62,10 @@ final class DeleteSubscriptionAction
 
         $this->repository->add($subscription);
 
-        $session->getFlashBag()->add('info', $this->translator->trans('tavy315_sylius_product_subscriptions.form.subscription_deleted'));
+        $session->getFlashBag()->add(
+            'info',
+            $this->translator->trans('tavy315_sylius_product_subscriptions.form.subscription_deleted')
+        );
 
         return new RedirectResponse($this->getRefererUrl($request), 302);
     }
@@ -85,6 +74,8 @@ final class DeleteSubscriptionAction
     {
         $referer = $request->headers->get('referer');
 
-        return !is_string($referer) ? $this->router->generate('sylius_shop_homepage', [], UrlGeneratorInterface::ABSOLUTE_PATH) : $referer;
+        return !is_string($referer)
+            ? $this->router->generate('sylius_shop_homepage', [], UrlGeneratorInterface::ABSOLUTE_PATH)
+            : $referer;
     }
 }

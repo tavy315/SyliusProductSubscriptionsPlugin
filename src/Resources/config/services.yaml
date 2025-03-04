@@ -67,6 +67,8 @@ services:
         arguments:
             - '@sylius.context.customer'
             - '@form.factory'
+            - '@sylius.repository.product'
+            - '@tavy315_sylius_product_subscriptions.repository.subscription'
             - '@twig'
 
     Tavy315\SyliusProductSubscriptionsPlugin\Menu\AccountMenuListener:

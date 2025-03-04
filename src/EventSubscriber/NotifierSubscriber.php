@@ -68,10 +68,7 @@ final readonly class NotifierSubscriber
 
     private function sendProductNotification(ProductInterface $product): void
     {
-        $subscriptions = $this->subscriptionRepository->findBy([
-            'product' => $product,
-            'status'  => StatusAwareInterface::STATUS_NEW,
-        ]);
+        $subscriptions = $this->subscriptionRepository->getNewProductSubscriptions($product);
 
         foreach ($subscriptions as $subscription) {
             $this->subscriptionNotifier->sendEmail($subscription, $product);

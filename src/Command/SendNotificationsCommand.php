@@ -9,7 +9,6 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Tavy315\SyliusProductSubscriptionsPlugin\Entity\StatusAwareInterface;
-use Tavy315\SyliusProductSubscriptionsPlugin\Entity\SubscriptionInterface;
 use Tavy315\SyliusProductSubscriptionsPlugin\Repository\SubscriptionRepositoryInterface;
 use Tavy315\SyliusProductSubscriptionsPlugin\Service\SubscriptionNotifierInterface;
 
@@ -34,10 +33,7 @@ final class SendNotificationsCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        /** @var SubscriptionInterface $subscription */
-        $subscriptions = $this->subscriptionRepository->findBy([
-            'status' => StatusAwareInterface::STATUS_NEW,
-        ]);
+        $subscriptions = $this->subscriptionRepository->getNewSubscriptions();
 
         foreach ($subscriptions as $subscription) {
             $product = $subscription->getProduct();
